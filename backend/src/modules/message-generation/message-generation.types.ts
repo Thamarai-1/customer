@@ -1,4 +1,4 @@
-import { Types, Document } from 'mongoose';
+import { Types, HydratedDocument } from 'mongoose';
 import { CustomerSegmentType } from '../segmentation/segmentation.constants.js';
 import { StrategyObjective, CommunicationTone } from '../strategies/strategies.types.js';
 import { ReminderStage } from '../billing-policies/billing-policies.types.js';
@@ -116,7 +116,7 @@ export interface IGeneratedMessage {
   updatedAt?: Date;
 }
 
-export interface IGeneratedMessageDocument extends IGeneratedMessage, Document {}
+export type IGeneratedMessageDocument = HydratedDocument<IGeneratedMessage>;
 
 export interface GenerateDraftOptions {
   channel?: string;

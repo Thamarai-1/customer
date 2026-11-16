@@ -39,14 +39,18 @@ export class AnthropicProvider implements IAIProvider {
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
+      const createParams: any = {
+        model,
+        max_tokens: request.maxTokens ?? 1200,
+        system: `${request.systemPrompt}\n\nOutput instructions: You MUST respond ONLY with a raw, valid JSON object matching the requested schema. Do not write any explanatory text before or after the JSON.`,
+        messages: [{ role: 'user', content: request.userPrompt }]
+      };
+      if (request.temperature !== undefined) {
+        createParams.temperature = request.temperature;
+      }
+
       const response = await client.messages.create(
-        {
-          model,
-          max_tokens: request.maxTokens ?? 1200,
-          temperature: request.temperature ?? 0.3,
-          system: `${request.systemPrompt}\n\nOutput instructions: You MUST respond ONLY with a raw, valid JSON object matching the requested schema. Do not write any explanatory text before or after the JSON.`,
-          messages: [{ role: 'user', content: request.userPrompt }]
-        },
+        createParams,
         { signal: controller.signal }
       );
 

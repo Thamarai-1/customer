@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { IGeneratedMessageDocument } from './message-generation.types.js';
+import { IGeneratedMessage, IGeneratedMessageDocument } from './message-generation.types.js';
 import { MessageGenerationStatus, GroundingStatus } from './message-generation.constants.js';
 import { CustomerSegmentType } from '../segmentation/segmentation.constants.js';
 
@@ -14,7 +14,7 @@ const FindingSchema = new Schema(
   { _id: false }
 );
 
-const GeneratedMessageSchema = new Schema<IGeneratedMessageDocument>(
+const GeneratedMessageSchema = new Schema<IGeneratedMessage>(
   {
     customerId: {
       type: String,
@@ -133,7 +133,7 @@ const GeneratedMessageSchema = new Schema<IGeneratedMessageDocument>(
 
 GeneratedMessageSchema.index({ customerId: 1, generatedAt: -1 });
 
-export const GeneratedMessageModel = mongoose.model<IGeneratedMessageDocument>(
+export const GeneratedMessageModel = mongoose.model<IGeneratedMessage, mongoose.Model<IGeneratedMessage, {}, {}, {}, IGeneratedMessageDocument>>(
   'GeneratedMessage',
   GeneratedMessageSchema
 );

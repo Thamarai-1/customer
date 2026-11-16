@@ -16,6 +16,7 @@ import { generatedEmailZodSchema } from '../message-generation.schema.js';
 import { GroundingValidator } from '../grounding-validator.js';
 import { GeneratedMessageModel } from '../message-generation.model.js';
 import { CustomerRepository } from '../../customers/customer.repository.js';
+import { CustomerSegmentType } from '../../segmentation/segmentation.constants.js';
 import { Types } from 'mongoose';
 import { logger } from '../../../utils/logger.js';
 
@@ -268,7 +269,7 @@ export const generateStructuredEmailNode = async (
       {
         systemPrompt: state.promptTemplate.systemPrompt,
         userPrompt,
-        schema: generatedEmailZodSchema,
+        schema: generatedEmailZodSchema as any,
         temperature: runtimeConfig.temperature,
         maxTokens: runtimeConfig.maxTokens,
         timeoutMs: runtimeConfig.timeoutMs
@@ -355,8 +356,8 @@ export const persistDraftNode = async (
 
   const primarySegment =
     state.policyReport?.strategy.primarySegment ||
-    state.customerProfile?.customerType ||
-    'CONSISTENT_CUSTOMER';
+    state.evidenceContext?.classification.primarySegment ||
+    CustomerSegmentType.CONSISTENT_CUSTOMER;
 
   const objective = state.policyReport?.strategy.primaryObjective || 'CUSTOMER_APPRECIATION';
 

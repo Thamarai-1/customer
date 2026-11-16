@@ -92,7 +92,6 @@ export class OpenAIProvider implements IAIProvider {
       };
     } catch (err: unknown) {
       clearTimeout(timer);
-      const latencyMs = Date.now() - startTime;
       if (err instanceof Error && (err.name === 'AbortError' || err.message.includes('abort'))) {
         throw new Error(`AI_PROVIDER_TIMEOUT: OpenAI request exceeded ${timeoutMs}ms limit`);
       }

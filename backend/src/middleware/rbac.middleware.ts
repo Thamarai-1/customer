@@ -27,7 +27,11 @@ export type Permission =
   | 'strategies:manage'
   | 'billing_policies:read'
   | 'billing_policies:manage'
-  | 'policy_engine:evaluate';
+  | 'policy_engine:evaluate'
+  | 'messages:read'
+  | 'messages:generate'
+  | 'ai_providers:read'
+  | 'ai_providers:manage';
 
 // Centralized permission mapping per role
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
@@ -56,7 +60,11 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'strategies:manage',
     'billing_policies:read',
     'billing_policies:manage',
-    'policy_engine:evaluate'
+    'policy_engine:evaluate',
+    'messages:read',
+    'messages:generate',
+    'ai_providers:read',
+    'ai_providers:manage'
   ],
   [UserRole.MARKETING_MANAGER]: [
     'customers:read',
@@ -76,7 +84,10 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'offers:manage',
     'strategies:read',
     'billing_policies:read',
-    'policy_engine:evaluate'
+    'policy_engine:evaluate',
+    'messages:read',
+    'messages:generate',
+    'ai_providers:read'
   ],
   [UserRole.COMPLIANCE_REVIEWER]: [
     'customers:read',
@@ -90,7 +101,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'offers:read',
     'strategies:read',
     'billing_policies:read',
-    'policy_engine:evaluate'
+    'policy_engine:evaluate',
+    'messages:read',
+    'ai_providers:read'
   ]
 };
 

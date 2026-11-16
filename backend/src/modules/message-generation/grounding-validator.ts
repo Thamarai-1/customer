@@ -15,7 +15,9 @@ export class GroundingValidator {
     evidence: IEvidenceContext
   ): GroundingValidationResult {
     const findings: IGroundingFinding[] = [];
-    const textToScan = `${message.subject} ${message.body}`.toLowerCase();
+    const body = message.body || '';
+    const subject = message.subject || '';
+    const textToScan = `${subject} ${body}`.toLowerCase();
 
     // 1. Offer Code Grounding
     const eligibleOfferCodes = (evidence.eligibleOffers || []).map((o) => o.offerCode.toUpperCase());
@@ -37,7 +39,7 @@ export class GroundingValidator {
 
     // Scan text for regex pattern of offer codes (e.g., OFFER-XYZ)
     const offerCodeRegex = /\bOFFER-[A-Z0-9-]+\b/gi;
-    const matchedOfferCodes = (message.body.match(offerCodeRegex) || []).map((c) => c.toUpperCase());
+    const matchedOfferCodes = (body.match(offerCodeRegex) || []).map((c) => c.toUpperCase());
     for (const code of matchedOfferCodes) {
       if (!eligibleOfferCodeSet.has(code)) {
         findings.push({
@@ -58,7 +60,7 @@ export class GroundingValidator {
           // Look for percentages like "60%" or "75%"
           const percentRegex = /(\d+)\s*%/g;
           let match: RegExpExecArray | null;
-          while ((match = percentRegex.exec(message.body)) !== null) {
+          while ((match = percentRegex.exec(body)) !== null) {
             const val = parseInt(match[1] || '0', 10);
             if (val > offer.value) {
               findings.push({
@@ -75,7 +77,7 @@ export class GroundingValidator {
     } else {
       // If eligibleOffers is empty, verify no discount percentages or offer rewards are promised
       const percentRegex = /(\d+)\s*%/g;
-      if (percentRegex.test(message.body)) {
+      if (percentRegex.test(body)) {
         findings.push({
           rule: 'unapprovedDiscountWithNoOffer',
           severity: 'ERROR',
@@ -94,7 +96,7 @@ export class GroundingValidator {
       // Extract currency amounts from text (e.g. $180, $180.00, USD 180)
       const amountRegex = /(?:\$|usd\s*|eur\s*|gbp\s*)(\d+(?:\.\d{2})?)/gi;
       let amountMatch: RegExpExecArray | null;
-      while ((amountMatch = amountRegex.exec(message.body)) !== null) {
+      while ((amountMatch = amountRegex.exec(body)) !== null) {
         const foundAmount = parseFloat(amountMatch[1] || '0');
         // If an amount is cited in billing context, it should match the verified overdue or outstanding amount
         const actualOutstanding = evidence.billing.totalOutstandingByCurrency[currency] ?? actualOverdue;
@@ -146,7 +148,7 @@ export class GroundingValidator {
     // 4. Customer Name Grounding
     if (evidence.customer.firstName) {
       // If customer first name is available, check that any "Dear [Name]" doesn't invent a wrong name
-      const dearMatch = message.body.match(/dear\s+([a-z]+)/i);
+      const dearMatch = body.match(/dear\s+([a-z]+)/i);
       if (dearMatch && dearMatch[1]) {
         const addressedName = dearMatch[1].toLowerCase();
         const expectedName = evidence.customer.firstName.toLowerCase();

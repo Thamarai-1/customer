@@ -6,7 +6,7 @@ import { GeminiProvider } from './providers/gemini.provider.js';
 import { AnthropicProvider } from './providers/anthropic.provider.js';
 
 export class AIProviderFactory {
-  private static providers: Map<AIProviderType, IAIProvider> = new Map([
+  private static providers: Map<AIProviderType, IAIProvider> = new Map<AIProviderType, IAIProvider>([
     [AIProviderType.OPENAI, new OpenAIProvider()],
     [AIProviderType.GEMINI, new GeminiProvider()],
     [AIProviderType.ANTHROPIC, new AnthropicProvider()]
