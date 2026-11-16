@@ -1,0 +1,28 @@
+# Backend .gitignore
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Secrets & Environment
+.env
+.env.*
+*.env
+!.env.example
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output/
+.vitest/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

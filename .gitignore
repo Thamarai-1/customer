@@ -1,45 +1,73 @@
+# ==============================================================================
+# Root .gitignore - Customer Loyalty and Engagement Assistant
+# ==============================================================================
+
 # Dependencies
 node_modules/
+*/node_modules/
+backend/node_modules/
+frontend/node_modules/
 .pnp/
 .pnp.js
 
-# Environment variables
+# Environment Variables & Secrets (Keep secrets out of version control)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
 *.env
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
 
-# Keep example files
+# Preserve public .env.example templates
 !.env.example
+!**/.env.example
 
-# Next.js build output
+# Next.js Build Output & Cache
 .next/
+frontend/.next/
 out/
+frontend/out/
+.turbo/
 
-# Backend build output
+# Backend Build Output & Artifacts
 dist/
+backend/dist/
 build/
+backend/build/
+*.tsbuildinfo
 
-# Coverage and testing
+# Testing & Coverage
 coverage/
+backend/coverage/
+frontend/coverage/
 *.lcov
-.nyc_output
+.nyc_output/
+.vitest/
+tmp/
+temp/
 
 # Logs
 logs/
+backend/logs/
+frontend/logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# OS files
+# OS Files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
 
-# IDE files
+# IDE & Editor Files
 .idea/
 .vscode/
 *.swp
@@ -47,6 +75,8 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# Docker
+# Docker & Database Local Storage
 docker-data/
+mongo-data/
+redis-data/
 *.pid
