@@ -27,7 +27,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
     NAVIGATION_ITEMS[0];
 
   const currentTitle = pathname === '/login' ? 'Account Login' : activeItem.label;
-  const isImplementedRoute = !pathname || pathname === '/' || pathname.startsWith('/customers') || pathname === '/login';
+  const isImplementedRoute =
+    !pathname ||
+    pathname === '/' ||
+    pathname.startsWith('/customers') ||
+    pathname.startsWith('/segments') ||
+    pathname === '/login';
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 font-sans">

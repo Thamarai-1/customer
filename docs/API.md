@@ -342,3 +342,181 @@ All routes require authentication.
     }
   }
   ```
+
+---
+
+## 10. Customer Segmentation Engine APIs (`/api/v1/segmentation`)
+
+### 10.1 Classify Single Customer
+- **Method**: `POST`
+- **URL**: `/api/v1/segmentation/customers/:customerId/classify`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`
+- **Description**: Deterministically analyzes verified customer profile, billing ledger, and activity history against configured thresholds, persists classification, and returns evidence.
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "success": true,
+    "message": "Customer classified successfully",
+    "data": {
+      "customerId": "CUST-1001",
+      "primarySegment": "CONSISTENT_CUSTOMER",
+      "segments": ["CONSISTENT_CUSTOMER"],
+      "classificationStatus": "CLASSIFIED",
+      "confidence": 0.95,
+      "reasonCodes": [
+        "REGULAR_ACTIVITY",
+        "ACTIVE_PLAN",
+        "PAYMENT_ON_TIME",
+        "CONSISTENT_ENGAGEMENT"
+      ],
+      "explanations": [
+        "Customer logged 8 activities in the past 30 days, demonstrating steady ongoing platform interaction.",
+        "Customer holds an active subscription under plan 'Unlimited 5G Pro' (Postpaid).",
+        "All billing invoices are fully paid on time with zero overdue balances across the billing history.",
+        "Customer demonstrates consistent multi-month interaction frequency and positive account standing."
+      ],
+      "evidence": {
+        "lastActivityDate": "2026-11-14T10:04:28.000Z",
+        "daysSinceLastActivity": 2,
+        "activityCount30d": 8,
+        "activityCountPrevious30d": 7,
+        "activityReductionPercent": 0,
+        "lifetimeActivityCount": 15,
+        "loyaltyTier": "SILVER",
+        "loyaltyPoints": 650,
+        "membershipDurationDays": 184,
+        "activePlan": "Unlimited 5G Pro",
+        "planStatus": "ACTIVE",
+        "planType": "Postpaid",
+        "totalInvoiced": 480.00,
+        "totalOutstandingAmount": 0.00,
+        "overdueInvoiceCount": 0,
+        "oldestOverdueDays": 0,
+        "oldestOverdueInvoiceId": null,
+        "overdueInvoiceIds": [],
+        "disputeCount": 0,
+        "hasDisputedInvoices": false,
+        "hasNonDisputedOverdue": false
+      },
+      "ruleVersion": "1.0.0",
+      "classifiedAt": "2026-11-16T12:00:00.000Z"
+    }
+  }
+  ```
+
+### 10.2 Get Customer Classification
+- **Method**: `GET`
+- **URL**: `/api/v1/segmentation/customers/:customerId`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`
+- **Description**: Returns the latest classification for a customer. If never evaluated before, triggers on-demand deterministic classification.
+
+### 10.3 Bulk Classify All Customers
+- **Method**: `POST`
+- **URL**: `/api/v1/segmentation/classify-all`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`
+- **Request Body (optional)**:
+  ```json
+  {
+    "batchSize": 100
+  }
+  ```
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "success": true,
+    "message": "Batch customer classification completed successfully",
+    "data": {
+      "totalCustomers": 120,
+      "processedCount": 120,
+      "classifiedCount": 118,
+      "insufficientDataCount": 2,
+      "failedCount": 0,
+      "multiSegmentCount": 18,
+      "durationMs": 485
+    }
+  }
+  ```
+
+### 10.4 Get Segment Catalog Definitions
+- **Method**: `GET`
+- **URL**: `/api/v1/segmentation/segments`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`
+- **Description**: Returns the 5 configured primary segment definitions, priorities, and descriptions.
+
+### 10.5 Get Customers by Segment
+- **Method**: `GET`
+- **URL**: `/api/v1/segmentation/segments/:segmentName/customers?page=1&limit=20&search=...&status=...`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`
+- **Path Parameter**: `:segmentName` = `OVERDUE_BILL` | `INACTIVE` | `DECLINING_ACTIVITY` | `LOYALTY_CANDIDATE` | `CONSISTENT_CUSTOMER` | `ALL`
+- **Query Parameters**:
+  - `page`: Page number (default: 1)
+  - `limit`: Records per page (default: 20)
+  - `search`: Search filter matching customer ID or plan name
+  - `status`: Filter by `CLASSIFIED` | `INSUFFICIENT_DATA`
+  - `minConfidence`: Minimum confidence filter (0.0 to 1.0)
+  - `sortBy`: Field to sort by (default: `classifiedAt`)
+  - `sortOrder`: `asc` | `desc` (default: `desc`)
+
+### 10.6 Get Segmentation Statistics
+- **Method**: `GET`
+- **URL**: `/api/v1/segmentation/statistics`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`
+- **Success Response (200 OK)**:
+  ```json
+  {
+    "success": true,
+    "message": "Segmentation statistics calculated successfully",
+    "data": {
+      "totalCustomers": 120,
+      "classifiedCustomers": 118,
+      "unclassifiedCustomers": 0,
+      "insufficientDataCustomers": 2,
+      "multiSegmentCustomers": 18,
+      "segmentCounts": {
+        "OVERDUE_BILL": 20,
+        "INACTIVE": 20,
+        "DECLINING_ACTIVITY": 25,
+        "LOYALTY_CANDIDATE": 30,
+        "CONSISTENT_CUSTOMER": 30
+      },
+      "primarySegmentCounts": {
+        "OVERDUE_BILL": 20,
+        "INACTIVE": 20,
+        "DECLINING_ACTIVITY": 25,
+        "LOYALTY_CANDIDATE": 25,
+        "CONSISTENT_CUSTOMER": 28
+      },
+      "segmentPercentages": {
+        "OVERDUE_BILL": 16.9,
+        "INACTIVE": 16.9,
+        "DECLINING_ACTIVITY": 21.2,
+        "LOYALTY_CANDIDATE": 25.4,
+        "CONSISTENT_CUSTOMER": 25.4
+      },
+      "lastRunTimestamp": "2026-11-16T12:00:00.000Z"
+    }
+  }
+  ```
+
+### 10.7 Get Customer Classification History
+- **Method**: `GET`
+- **URL**: `/api/v1/segmentation/customers/:customerId/history?limit=20`
+- **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`
+- **Description**: Returns immutable audit trail of past classifications, timestamps, rule versions, and transitions.
+
+### 10.8 Get & Update Segmentation Configuration
+- **Get Active Config**: `GET /api/v1/segmentation/config`
+  - **Allowed Roles**: `ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`
+- **Update Configuration**: `PUT /api/v1/segmentation/config`
+  - **Allowed Roles**: `ADMIN` only
+  - **Request Body**:
+    ```json
+    {
+      "ruleVersion": "1.1.0",
+      "activityReductionThresholdPercent": 50,
+      "inactivityThresholdDays": 60,
+      "loyaltyPointsThreshold": 1200,
+      "membershipDurationDaysThreshold": 180,
+      "notes": "Updated for enterprise seasonal review"
+    }
+    ```

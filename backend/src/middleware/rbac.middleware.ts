@@ -15,6 +15,9 @@ export type Permission =
   | 'preferences:read'
   | 'preferences:update'
   | 'import:execute'
+  | 'segmentation:read'
+  | 'segmentation:classify'
+  | 'segmentation:manage'
   | 'audit:read';
 
 // Centralized permission mapping per role
@@ -32,6 +35,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'preferences:read',
     'preferences:update',
     'import:execute',
+    'segmentation:read',
+    'segmentation:classify',
+    'segmentation:manage',
     'audit:read'
   ],
   [UserRole.MARKETING_MANAGER]: [
@@ -43,7 +49,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'billing:read',
     'preferences:read',
     'preferences:update',
-    'import:execute'
+    'import:execute',
+    'segmentation:read',
+    'segmentation:classify'
   ],
   [UserRole.COMPLIANCE_REVIEWER]: [
     'customers:read',
@@ -51,6 +59,7 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'billing:read',
     'preferences:read',
     'preferences:update',
+    'segmentation:read',
     'audit:read'
   ]
 };

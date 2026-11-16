@@ -16,7 +16,8 @@
     "seed:customers": "tsx src/scripts/seed-customers.ts",
     "seed:activities": "tsx src/scripts/seed-activities.ts",
     "seed:billing": "tsx src/scripts/seed-billing.ts",
-    "seed:preferences": "tsx src/scripts/seed-preferences.ts"
+    "seed:preferences": "tsx src/scripts/seed-preferences.ts",
+    "seed:segments": "tsx src/scripts/seed-segments.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

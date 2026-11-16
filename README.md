@@ -20,7 +20,7 @@ The **Customer Loyalty and Engagement Assistant** categorizes retail and telecom
 - **Probabilistic GenAI**: Grounded message drafting bounded by verified customer facts (integrated in Phase 5).
 - **Human-in-the-Loop Review**: Mandatory approval queue and audit logging before any message is dispatched.
 
-This repository contains the completed **Phase 1: Project Initialization, Architecture and Database Design** and **Phase 2: Backend Foundation, Authentication, and Customer Management**.
+This repository contains the completed **Phase 1: Project Initialization, Architecture and Database Design**, **Phase 2: Backend Foundation, Authentication, and Customer Management**, and **Phase 3: Customer Segmentation Engine**.
 
 ---
 
@@ -31,6 +31,7 @@ The platform uses a **Modular Monolith** architecture:
 - Backend modules follow a service-oriented structure: Routes, Controllers, Services, Repositories, Models, Middlewares, Schemas, and Types.
 - 13 concrete MongoDB data models define the future data contracts.
 - Phase 2 establishes enterprise authentication (JWT + HttpOnly cookies + token rotation with reuse detection), RBAC (`ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`), customer management, consolidated customer 360° profile assembly, activity tracking, billing record management, communication preferences, and resilient CSV/JSON data ingestion.
+- Phase 3 delivers a transparent, deterministic customer segmentation engine: multi-label categorization across 5 primary segments, priority hierarchy, explainable reason codes, grounded evidence collection, dynamic confidence calculation, configuration management, and full analytics dashboard with Recharts.
 
 For complete architectural specifications and Mermaid diagrams, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/API.md`](docs/API.md).
 
@@ -165,12 +166,12 @@ Services will be accessible at:
 ## 5. Testing & Verification
 
 ### Backend Tests
-Execute unit and integration tests across authentication, token rotation, RBAC, customer management, profile assembly, CSV/JSON import, health, environment validation, database lifecycle, and Redis client handling:
+Execute unit and integration tests across segmentation engine rules, evaluation scenarios, API endpoints, authentication, token rotation, RBAC, customer management, profile assembly, CSV/JSON import, health, environment validation, database lifecycle, and Redis client handling:
 ```bash
 cd backend
 npm test
 ```
-**Results**: 9 test suites passed, 39 tests passed (100% pass rate).
+**Results**: 11 test suites passed, 60 tests passed (100% pass rate).
 
 ### Frontend Tests & Typecheck
 Execute UI layout shell tests and production build verification:
@@ -179,24 +180,31 @@ cd frontend
 npm test
 npm run build
 ```
-**Results**: 1 test suite passed, 4 tests passed, production build generated cleanly (`/`, `/login`, `/customers`, `/customers/[id]`).
+**Results**: 1 test suite passed, 4 tests passed, Next.js production build generated cleanly (`/`, `/login`, `/customers`, `/customers/[id]`, `/segments`).
 
 ---
 
 ## 6. Phase Deliverables & Status
 
-### Completed in Phase 1 & Phase 2
+### Completed in Phase 1, Phase 2 & Phase 3
 - **Phase 1: Foundation**: Modular monolith architecture, TypeScript strict configs, Express + Mongoose + Redis connectivity, 13 data models, Docker + Nginx orchestration, and comprehensive system documentation.
 - **Phase 2: Authentication & RBAC**: JWT access + refresh token rotation, HttpOnly cookie support, token reuse revocation, login rate limiting, password hashing with bcrypt, central permission matrix (`ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`), admin bootstrap.
-- **Phase 2: Customer Management**: Full CRUD, business `customerId` indexing, soft deletion/archival, multi-field search (`customerId`, `name`, `email`), filters (`customerType`, `accountStatus`, `loyaltyTier`), cursor/offset pagination.
-- **Phase 2: Customer 360° Profile Assembly**: Parallel asynchronous resolution of customer identity, subscription, 30d/60d activity velocity, billing status, and communication preferences into an enterprise profile DTO (`GET /api/v1/customers/:id/profile`).
-- **Phase 2: Sub-Resource Management**: Customer activities with 30-day velocity comparison, billing records with balance breakdown and dispute tracking, and opt-out/channel communication preferences.
-- **Phase 2: Resilient Bulk Ingestion**: CSV and JSON batch import with Multer, intra-batch and database duplicate detection, row-level error reporting, and partial success support (`POST /api/v1/customers/import`).
-- **Phase 2: Synthetic Data Generator**: 120 realistic customers across 5 personas (Consistent Active, High-Loyalty, Declining, Inactive/Dormant, Overdue Balance) with corresponding activity histories, billing invoices, and communication preferences.
-- **Phase 2: Minimal Frontend**: Next.js App Router UI including `/login` with quick-fill demo buttons, `/customers` searchable table, `/customers/[id]` 360° customer profile card view, and React `AuthContext` session management.
+- **Phase 2: Customer Management & Profile Assembly**: Full CRUD, business `customerId` indexing, soft deletion/archival, multi-field search, filters, pagination, parallel 360° profile assembly, activity velocity, billing ledger, and communication preferences.
+- **Phase 2: Ingestion & Synthetic Data**: Resilient CSV/JSON import with row-level error reporting, and 120 synthetic customer personas.
+- **Phase 3: Customer Segmentation Engine**:
+  - Deterministic, explainable business logic evaluating activity velocity, loyalty tenure, active plans, and billing status.
+  - Multi-label classification supporting all 5 primary segments: `OVERDUE_BILL`, `INACTIVE`, `DECLINING_ACTIVITY`, `LOYALTY_CANDIDATE`, `CONSISTENT_CUSTOMER`.
+  - Configurable primary segment selection hierarchy.
+  - Centralized reason code system with evidence-grounded human-readable explanations.
+  - Transparent, evidence-completeness confidence calculation.
+  - Insufficient data handling (`INSUFFICIENT_DATA` status with bounded confidence).
+  - Explicit dispute exclusions preventing unwarranted overdue classifications.
+  - Dual collection architecture: latest snapshot collection + immutable classification history collection.
+  - Non-blocking batch processing (`POST /api/v1/segmentation/classify-all`) capable of handling large customer volumes without memory bloat.
+  - Dynamic rule configuration APIs (`GET /api/v1/segmentation/config`, `PUT /api/v1/segmentation/config`) with semantic versioning and administrative RBAC.
+  - Interactive Next.js Frontend Dashboard (`/segments`) with Recharts visual distribution charts, segment category cards, filterable customer ledger, and 360° evidence inspection modal.
 
-### Intentionally Deferred to Phase 3 and Beyond
-- **Phase 3**: Customer segmentation engine (deterministic rule evaluation, reason codes, confidence scoring).
+### Intentionally Deferred to Phase 4 and Beyond
 - **Phase 4**: Campaign policy engine, offer/reward eligibility, billing reminder progression logic.
 - **Phase 5**: LangGraph.js orchestration and multi-model GenAI integration (OpenAI, Gemini, Claude).
 - **Phase 6**: Groundedness verification, safety guardrails, compliance checks, sensitive data detection.
