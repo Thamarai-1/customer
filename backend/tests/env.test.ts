@@ -14,7 +14,7 @@ describe('Environment Configuration Validation', () => {
     expect(config.BACKEND_PORT).toBe(5000);
     expect(config.MONGODB_URI).toBe('mongodb://localhost:27017/test_db');
     expect(config.REDIS_URL).toBe('redis://localhost:6379');
-    expect(config.JWT_EXPIRES_IN).toBe('1d');
+    expect(config.JWT_EXPIRES_IN).toBe('15m');
   });
 
   it('should provide sensible defaults when optional environment keys are omitted', () => {

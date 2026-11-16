@@ -47,8 +47,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeModuleId, onSelectModule
             : (pathname?.startsWith(item.path) ?? false);
 
           return (
-            <button
+            <Link
               key={item.id}
+              href={item.path}
               onClick={() => onSelectModule && onSelectModule(item.id)}
               className={cn(
                 'w-full flex items-center px-3 py-2 text-xs font-medium rounded-lg transition-all text-left group',
@@ -76,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeModuleId, onSelectModule
                   {item.badge}
                 </span>
               )}
-            </button>
+            </Link>
           );
         })}
       </div>
@@ -86,8 +87,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeModuleId, onSelectModule
         <div className="flex items-center space-x-2 text-slate-400 text-xs">
           <Shield className="h-4 w-4 text-emerald-400 flex-shrink-0" />
           <div className="truncate">
-            <p className="text-[11px] font-medium text-slate-200">Phase 1: Foundation</p>
-            <p className="text-[10px] text-slate-400">Enterprise CRM Core</p>
+            <p className="text-[11px] font-medium text-slate-200">Phase 2: Core Platform</p>
+            <p className="text-[10px] text-slate-400">Auth & Customer Hub Active</p>
           </div>
         </div>
       </div>

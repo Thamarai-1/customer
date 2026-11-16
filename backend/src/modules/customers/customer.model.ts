@@ -1,30 +1,45 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
-export enum CustomerStatus {
-  ACTIVE = 'active',
-  DORMANT = 'dormant',
-  AT_RISK = 'at_risk',
-  CHURNED = 'churned'
+export enum CustomerType {
+  RETAIL = 'RETAIL',
+  TELECOM = 'TELECOM',
+  ENTERPRISE = 'ENTERPRISE',
+  INDIVIDUAL = 'INDIVIDUAL'
+}
+
+export enum AccountStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  SUSPENDED = 'SUSPENDED',
+  ARCHIVED = 'ARCHIVED'
 }
 
 export enum LoyaltyTier {
-  STANDARD = 'standard',
-  SILVER = 'silver',
-  GOLD = 'gold',
-  PLATINUM = 'platinum'
+  BRONZE = 'BRONZE',
+  SILVER = 'SILVER',
+  GOLD = 'GOLD',
+  PLATINUM = 'PLATINUM'
 }
 
-export enum IndustryType {
-  RETAIL = 'retail',
-  TELECOM = 'telecom'
+export enum PlanStatus {
+  ACTIVE = 'ACTIVE',
+  PENDING = 'PENDING',
+  EXPIRED = 'EXPIRED',
+  CANCELLED = 'CANCELLED'
 }
 
-export interface IPlanDetails {
-  planName: string;
-  monthlyFee: number;
-  currency: string;
-  startDate: Date;
-  contractTermMonths?: number;
+export interface ILoyaltyInfo {
+  loyaltyTier: LoyaltyTier;
+  loyaltyPoints: number;
+  membershipStartDate: Date;
+}
+
+export interface ISubscriptionInfo {
+  activePlan: string;
+  planType: string;
+  planStatus: PlanStatus;
+  planStartDate: Date;
+  planEndDate?: Date;
 }
 
 export interface ICustomer extends Document {
@@ -33,24 +48,64 @@ export interface ICustomer extends Document {
   lastName: string;
   email: string;
   phone?: string;
-  industry: IndustryType;
-  status: CustomerStatus;
-  loyaltyTier: LoyaltyTier;
-  loyaltyPoints: number;
-  tenureMonths: number;
-  planDetails?: IPlanDetails;
+  customerType: CustomerType;
+  accountStatus: AccountStatus;
+  loyaltyInfo: ILoyaltyInfo;
+  subscription: ISubscriptionInfo;
+  source: string;
   assignedSegmentId?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const PlanDetailsSchema = new Schema<IPlanDetails>(
+const LoyaltyInfoSchema = new Schema<ILoyaltyInfo>(
   {
-    planName: { type: String, required: true },
-    monthlyFee: { type: Number, required: true },
-    currency: { type: String, default: 'USD' },
-    startDate: { type: Date, required: true },
-    contractTermMonths: { type: Number }
+    loyaltyTier: {
+      type: String,
+      enum: Object.values(LoyaltyTier),
+      default: LoyaltyTier.BRONZE,
+      required: true
+    },
+    loyaltyPoints: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    membershipStartDate: {
+      type: Date,
+      default: Date.now,
+      required: true
+    }
+  },
+  { _id: false }
+);
+
+const SubscriptionInfoSchema = new Schema<ISubscriptionInfo>(
+  {
+    activePlan: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    planType: {
+      type: String,
+      default: 'Postpaid',
+      trim: true
+    },
+    planStatus: {
+      type: String,
+      enum: Object.values(PlanStatus),
+      default: PlanStatus.ACTIVE,
+      required: true
+    },
+    planStartDate: {
+      type: Date,
+      default: Date.now,
+      required: true
+    },
+    planEndDate: {
+      type: Date
+    }
   },
   { _id: false }
 );
@@ -62,6 +117,7 @@ const CustomerSchema = new Schema<ICustomer>(
       required: true,
       unique: true,
       trim: true,
+      uppercase: true,
       index: true
     },
     firstName: {
@@ -77,6 +133,7 @@ const CustomerSchema = new Schema<ICustomer>(
     email: {
       type: String,
       required: true,
+      unique: true,
       lowercase: true,
       trim: true,
       index: true
@@ -85,34 +142,43 @@ const CustomerSchema = new Schema<ICustomer>(
       type: String,
       trim: true
     },
-    industry: {
+    customerType: {
       type: String,
-      enum: Object.values(IndustryType),
+      enum: Object.values(CustomerType),
+      default: CustomerType.RETAIL,
       required: true,
       index: true
     },
-    status: {
+    accountStatus: {
       type: String,
-      enum: Object.values(CustomerStatus),
-      default: CustomerStatus.ACTIVE,
+      enum: Object.values(AccountStatus),
+      default: AccountStatus.ACTIVE,
+      required: true,
       index: true
     },
-    loyaltyTier: {
+    loyaltyInfo: {
+      type: LoyaltyInfoSchema,
+      required: true,
+      default: () => ({
+        loyaltyTier: LoyaltyTier.BRONZE,
+        loyaltyPoints: 0,
+        membershipStartDate: new Date()
+      })
+    },
+    subscription: {
+      type: SubscriptionInfoSchema,
+      required: true,
+      default: () => ({
+        activePlan: 'Standard',
+        planType: 'Postpaid',
+        planStatus: PlanStatus.ACTIVE,
+        planStartDate: new Date()
+      })
+    },
+    source: {
       type: String,
-      enum: Object.values(LoyaltyTier),
-      default: LoyaltyTier.STANDARD,
-      index: true
-    },
-    loyaltyPoints: {
-      type: Number,
-      default: 0
-    },
-    tenureMonths: {
-      type: Number,
-      default: 0
-    },
-    planDetails: {
-      type: PlanDetailsSchema
+      default: 'MANUAL',
+      trim: true
     },
     assignedSegmentId: {
       type: Schema.Types.ObjectId,
@@ -126,8 +192,10 @@ const CustomerSchema = new Schema<ICustomer>(
   }
 );
 
-CustomerSchema.index({ email: 1, industry: 1 });
-CustomerSchema.index({ status: 1, loyaltyTier: 1 });
+// Compound and text indexes for fast queries
+CustomerSchema.index({ accountStatus: 1, 'loyaltyInfo.loyaltyTier': 1 });
+CustomerSchema.index({ 'subscription.activePlan': 1, 'subscription.planStatus': 1 });
+CustomerSchema.index({ firstName: 'text', lastName: 'text', email: 'text', customerId: 'text' });
 
 export const CustomerModel: Model<ICustomer> =
   mongoose.models.Customer || mongoose.model<ICustomer>('Customer', CustomerSchema);

@@ -1,33 +1,31 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 
-export enum BillingStatus {
-  PAID = 'paid',
-  PENDING = 'pending',
-  OVERDUE = 'overdue',
-  DISPUTED = 'disputed',
-  CANCELLED = 'cancelled'
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  PARTIALLY_PAID = 'PARTIALLY_PAID',
+  OVERDUE = 'OVERDUE'
 }
 
-export enum ReminderStage {
-  NONE = 'none',
-  FIRST_COURTEOUS = 'first_courteous',
-  SECOND_REMINDER = 'second_reminder',
-  FINAL_OVERDUE = 'final_overdue'
+export enum InvoiceStatus {
+  ACTIVE = 'ACTIVE',
+  CANCELLED = 'CANCELLED',
+  CLOSED = 'CLOSED'
 }
 
 export interface IBillingRecord extends Document {
-  customerRef: Types.ObjectId;
   customerId: string;
-  invoiceNumber: string;
-  billingDate: Date;
-  dueDate: Date;
-  amountDue: number;
-  amountPaid: number;
+  customerRef?: Types.ObjectId;
+  invoiceId: string;
+  invoiceAmount: number;
+  outstandingAmount: number;
   currency: string;
-  status: BillingStatus;
-  daysOverdue: number;
-  reminderStage: ReminderStage;
-  paidAt?: Date;
+  invoiceDate: Date;
+  dueDate: Date;
+  paymentDate?: Date;
+  paymentStatus: PaymentStatus;
+  invoiceStatus: InvoiceStatus;
+  disputeStatus: string;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -35,69 +33,79 @@ export interface IBillingRecord extends Document {
 
 const BillingRecordSchema = new Schema<IBillingRecord>(
   {
-    customerRef: {
-      type: Schema.Types.ObjectId,
-      ref: 'Customer',
-      required: true,
-      index: true
-    },
     customerId: {
       type: String,
       required: true,
+      index: true,
+      trim: true,
+      uppercase: true
+    },
+    customerRef: {
+      type: Schema.Types.ObjectId,
+      ref: 'Customer',
       index: true
     },
-    invoiceNumber: {
+    invoiceId: {
       type: String,
       required: true,
       unique: true,
       trim: true,
+      uppercase: true,
       index: true
     },
-    billingDate: {
+    invoiceAmount: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    outstandingAmount: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0
+    },
+    currency: {
+      type: String,
+      required: true,
+      default: 'USD',
+      trim: true,
+      uppercase: true
+    },
+    invoiceDate: {
       type: Date,
-      required: true
+      required: true,
+      default: Date.now
     },
     dueDate: {
       type: Date,
       required: true,
       index: true
     },
-    amountDue: {
-      type: Number,
-      required: true,
-      min: 0
-    },
-    amountPaid: {
-      type: Number,
-      default: 0,
-      min: 0
-    },
-    currency: {
-      type: String,
-      default: 'USD',
-      trim: true
-    },
-    status: {
-      type: String,
-      enum: Object.values(BillingStatus),
-      default: BillingStatus.PENDING,
-      index: true
-    },
-    daysOverdue: {
-      type: Number,
-      default: 0
-    },
-    reminderStage: {
-      type: String,
-      enum: Object.values(ReminderStage),
-      default: ReminderStage.NONE,
-      index: true
-    },
-    paidAt: {
+    paymentDate: {
       type: Date
     },
+    paymentStatus: {
+      type: String,
+      enum: Object.values(PaymentStatus),
+      default: PaymentStatus.PENDING,
+      required: true,
+      index: true
+    },
+    invoiceStatus: {
+      type: String,
+      enum: Object.values(InvoiceStatus),
+      default: InvoiceStatus.ACTIVE,
+      required: true,
+      index: true
+    },
+    disputeStatus: {
+      type: String,
+      default: 'NONE',
+      trim: true
+    },
     notes: {
-      type: String
+      type: String,
+      trim: true
     }
   },
   {
@@ -106,8 +114,8 @@ const BillingRecordSchema = new Schema<IBillingRecord>(
   }
 );
 
-BillingRecordSchema.index({ customerRef: 1, status: 1 });
-BillingRecordSchema.index({ status: 1, dueDate: 1 });
+BillingRecordSchema.index({ customerId: 1, invoiceDate: -1 });
+BillingRecordSchema.index({ paymentStatus: 1, dueDate: 1 });
 
 export const BillingRecordModel: Model<IBillingRecord> =
   mongoose.models.BillingRecord ||

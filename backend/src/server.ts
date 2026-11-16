@@ -3,6 +3,7 @@ import app from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 import { connectRedis, disconnectRedis } from './config/redis.js';
+import { AuthService } from './modules/auth/auth.service.js';
 import { logger } from './utils/logger.js';
 
 let server: Server | null = null;
@@ -15,6 +16,8 @@ const startServer = async (): Promise<void> => {
     // Connect Primary Database
     try {
       await connectDatabase();
+      // Bootstrap initial admin user if not present
+      await AuthService.bootstrapAdmin();
     } catch (dbError) {
       logger.error('Failed to connect to primary database during startup', 'Server', {
         error: dbError instanceof Error ? dbError.message : String(dbError)

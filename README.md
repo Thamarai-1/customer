@@ -20,7 +20,7 @@ The **Customer Loyalty and Engagement Assistant** categorizes retail and telecom
 - **Probabilistic GenAI**: Grounded message drafting bounded by verified customer facts (integrated in Phase 5).
 - **Human-in-the-Loop Review**: Mandatory approval queue and audit logging before any message is dispatched.
 
-This repository represents the completed **Phase 1: Project Initialization, Architecture and Database Design**.
+This repository contains the completed **Phase 1: Project Initialization, Architecture and Database Design** and **Phase 2: Backend Foundation, Authentication, and Customer Management**.
 
 ---
 
@@ -30,8 +30,9 @@ The platform uses a **Modular Monolith** architecture:
 - Frontend and backend live in a unified repository with independent build lifecycles and strict boundary separation.
 - Backend modules follow a service-oriented structure: Routes, Controllers, Services, Repositories, Models, Middlewares, Schemas, and Types.
 - 13 concrete MongoDB data models define the future data contracts.
+- Phase 2 establishes enterprise authentication (JWT + HttpOnly cookies + token rotation with reuse detection), RBAC (`ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`), customer management, consolidated customer 360° profile assembly, activity tracking, billing record management, communication preferences, and resilient CSV/JSON data ingestion.
 
-For complete architectural specifications and Mermaid diagrams, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+For complete architectural specifications and Mermaid diagrams, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) and [`docs/API.md`](docs/API.md).
 
 ---
 
@@ -111,6 +112,17 @@ customer-engagement-assistant/
 - Node.js 20+ and npm 10+
 - MongoDB and Redis (local instances or via Docker)
 
+### Default Seed Credentials
+
+When MongoDB connects, an initial administrator account is automatically bootstrapped if no admin exists:
+- **Admin Email**: `admin@engagement.hcl.com`
+- **Admin Password**: `AdminSecure123!`
+- **Role**: `ADMIN`
+
+Additional demo users seeded via `npm run seed:users`:
+- **Marketing Manager**: `priya.marketing@example.com` / `MarketPass123!`
+- **Compliance Reviewer**: `david.compliance@example.com` / `ReviewerPass123!`
+
 ### Option A: Local Development (Recommended for rapid testing)
 
 1. **Configure Environment Variables**:
@@ -124,6 +136,7 @@ customer-engagement-assistant/
    npm install
    npm run build
    npm test
+   npm run seed        # Seeds users, 120 customers, activities, billing, and preferences
    npm run dev
    ```
 
@@ -132,9 +145,10 @@ customer-engagement-assistant/
    cd frontend
    npm install
    npm test
+   npm run build
    npm run dev
    ```
-   Open `http://localhost:3000` in your web browser.
+   Open `http://localhost:3000` in your web browser. Navigate to `http://localhost:3000/login` to authenticate or `http://localhost:3000/customers` to inspect customer profiles.
 
 ### Option B: Docker Compose (All Services)
 
@@ -144,48 +158,46 @@ docker compose up --build -d
 Services will be accessible at:
 - Gateway (Nginx): `http://localhost:80`
 - Frontend: `http://localhost:3000`
-- Backend Health: `http://localhost:5000/api/v1/health`
+- Backend API & Health: `http://localhost:5000/api/v1/health`
 
 ---
 
 ## 5. Testing & Verification
 
 ### Backend Tests
-Execute unit and integration tests across health, environment validation, database lifecycle, and Redis client handling:
+Execute unit and integration tests across authentication, token rotation, RBAC, customer management, profile assembly, CSV/JSON import, health, environment validation, database lifecycle, and Redis client handling:
 ```bash
 cd backend
 npm test
 ```
-**Results**: 4 test suites passed, 13 tests passed.
+**Results**: 9 test suites passed, 39 tests passed (100% pass rate).
 
-### Frontend Tests
-Execute UI and layout shell tests:
+### Frontend Tests & Typecheck
+Execute UI layout shell tests and production build verification:
 ```bash
 cd frontend
 npm test
+npm run build
 ```
-**Results**: 1 test suite passed, 4 tests passed.
+**Results**: 1 test suite passed, 4 tests passed, production build generated cleanly (`/`, `/login`, `/customers`, `/customers/[id]`).
 
 ---
 
-## 6. Phase 1 Deliverables & Deferred Work
+## 6. Phase Deliverables & Status
 
-### Completed in Phase 1
-- Repository and modular directory structure initialized.
-- TypeScript strict configuration on frontend and backend.
-- Express backend with Helmet, CORS, Morgan, centralized error handling, and Zod env validation.
-- MongoDB database lifecycle and connection handling with 13 concrete data models.
-- Redis connectivity client and health check service.
-- Next.js 14 App Router frontend with Tailwind CSS enterprise CRM design system.
-- Application shell with 10 required navigation items, status pills, and user profile.
-- Real-time frontend-to-backend communication via TanStack Query.
-- Multi-stage Dockerfiles and Docker Compose with Nginx reverse proxy.
-- Comprehensive documentation (`ARCHITECTURE.md`, `DATABASE.md`, `API_DESIGN.md`, `DEVELOPMENT.md`).
+### Completed in Phase 1 & Phase 2
+- **Phase 1: Foundation**: Modular monolith architecture, TypeScript strict configs, Express + Mongoose + Redis connectivity, 13 data models, Docker + Nginx orchestration, and comprehensive system documentation.
+- **Phase 2: Authentication & RBAC**: JWT access + refresh token rotation, HttpOnly cookie support, token reuse revocation, login rate limiting, password hashing with bcrypt, central permission matrix (`ADMIN`, `MARKETING_MANAGER`, `COMPLIANCE_REVIEWER`), admin bootstrap.
+- **Phase 2: Customer Management**: Full CRUD, business `customerId` indexing, soft deletion/archival, multi-field search (`customerId`, `name`, `email`), filters (`customerType`, `accountStatus`, `loyaltyTier`), cursor/offset pagination.
+- **Phase 2: Customer 360° Profile Assembly**: Parallel asynchronous resolution of customer identity, subscription, 30d/60d activity velocity, billing status, and communication preferences into an enterprise profile DTO (`GET /api/v1/customers/:id/profile`).
+- **Phase 2: Sub-Resource Management**: Customer activities with 30-day velocity comparison, billing records with balance breakdown and dispute tracking, and opt-out/channel communication preferences.
+- **Phase 2: Resilient Bulk Ingestion**: CSV and JSON batch import with Multer, intra-batch and database duplicate detection, row-level error reporting, and partial success support (`POST /api/v1/customers/import`).
+- **Phase 2: Synthetic Data Generator**: 120 realistic customers across 5 personas (Consistent Active, High-Loyalty, Declining, Inactive/Dormant, Overdue Balance) with corresponding activity histories, billing invoices, and communication preferences.
+- **Phase 2: Minimal Frontend**: Next.js App Router UI including `/login` with quick-fill demo buttons, `/customers` searchable table, `/customers/[id]` 360° customer profile card view, and React `AuthContext` session management.
 
-### Intentionally Deferred to Phase 2 and Beyond
-- **Phase 2**: JWT authentication, bcrypt password hashing, login/registration controllers, route protection middleware.
-- **Phase 3**: Customer profile assembly, activity ingestion, deterministic segmentation engine.
-- **Phase 4**: Campaign management, offer eligibility engine, billing reminder progression.
+### Intentionally Deferred to Phase 3 and Beyond
+- **Phase 3**: Customer segmentation engine (deterministic rule evaluation, reason codes, confidence scoring).
+- **Phase 4**: Campaign policy engine, offer/reward eligibility, billing reminder progression logic.
 - **Phase 5**: LangGraph.js orchestration and multi-model GenAI integration (OpenAI, Gemini, Claude).
 - **Phase 6**: Groundedness verification, safety guardrails, compliance checks, sensitive data detection.
 - **Phase 7**: Interactive human-in-the-loop approval workflow and feedback capture.

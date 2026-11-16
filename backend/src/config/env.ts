@@ -34,7 +34,12 @@ const envSchema = z.object({
     .pipe(z.number().positive()),
   CORS_ORIGIN: z.string().default('*'),
   JWT_SECRET: z.string().default('replace_with_secure_secret_min_32_characters_long'),
-  JWT_EXPIRES_IN: z.string().default('1d'),
+  JWT_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_SECRET: z.string().default('replace_with_secure_refresh_secret_min_32_characters_long'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  ADMIN_EMAIL: z.string().default('admin@engagement.hcl.com'),
+  ADMIN_PASSWORD: z.string().default('Admin@Secure2026!'),
+  ADMIN_NAME: z.string().default('System Administrator'),
   // GenAI provider placeholders for Phase 5 (optional in Phase 1)
   OPENAI_API_KEY: z.string().optional().default(''),
   GEMINI_API_KEY: z.string().optional().default(''),

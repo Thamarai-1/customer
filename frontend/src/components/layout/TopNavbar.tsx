@@ -1,8 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Search, Bell, Activity, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { Search, Bell, AlertCircle, CheckCircle2, RefreshCw, LogOut, LogIn } from 'lucide-react';
 import { useApiHealth } from '../../hooks/useHealth';
+import { useAuth } from '../../contexts/AuthContext';
 import { Badge } from '../ui/badge';
 
 interface TopNavbarProps {
@@ -13,6 +15,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   currentTitle = 'Dashboard'
 }) => {
   const { data: health, isLoading, isError, refetch } = useApiHealth();
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between z-10 sticky top-0">
@@ -72,20 +75,51 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
           <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-blue-600"></span>
         </button>
 
-        {/* User Profile Placeholder */}
-        <div className="flex items-center space-x-3 pl-3 border-l border-slate-200">
-          <div className="h-8 w-8 rounded-full bg-blue-600 text-white font-medium text-xs flex items-center justify-center shadow-sm">
-            HA
+        {/* User Profile */}
+        {isAuthenticated && user ? (
+          <div className="flex items-center space-x-3 pl-3 border-l border-slate-200">
+            <div className="h-8 w-8 rounded-full bg-blue-600 text-white font-medium text-xs flex items-center justify-center shadow-sm">
+              {user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || 'U'}
+            </div>
+            <div className="hidden sm:flex flex-col text-left">
+              <span className="text-xs font-medium text-slate-900 leading-tight">
+                {user.name}
+              </span>
+              <span className="text-[10px] text-slate-500">
+                {user.role}
+              </span>
+            </div>
+            <button
+              onClick={() => logout()}
+              title="Sign Out"
+              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ml-1"
+              aria-label="Sign Out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
           </div>
-          <div className="hidden sm:flex flex-col text-left">
-            <span className="text-xs font-medium text-slate-900 leading-tight">
-              Hackathon Admin
-            </span>
-            <span className="text-[10px] text-slate-500">
-              Enterprise Reviewer
-            </span>
+        ) : (
+          <div className="flex items-center space-x-3 pl-3 border-l border-slate-200">
+            <div className="h-8 w-8 rounded-full bg-blue-600 text-white font-medium text-xs flex items-center justify-center shadow-sm">
+              HA
+            </div>
+            <div className="hidden sm:flex flex-col text-left">
+              <span className="text-xs font-medium text-slate-900 leading-tight">
+                Hackathon Admin
+              </span>
+              <span className="text-[10px] text-slate-500">
+                Enterprise Reviewer
+              </span>
+            </div>
+            <Link
+              href="/login"
+              className="ml-2 text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center space-x-1"
+            >
+              <LogIn className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">Sign In</span>
+            </Link>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

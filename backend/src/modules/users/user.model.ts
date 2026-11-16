@@ -1,24 +1,17 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export enum UserRole {
-  ADMIN = 'admin',
-  REVIEWER = 'reviewer',
-  AGENT = 'agent',
-  COMPLIANCE_OFFICER = 'compliance_officer'
-}
-
-export enum UserStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  SUSPENDED = 'suspended'
+  ADMIN = 'ADMIN',
+  MARKETING_MANAGER = 'MARKETING_MANAGER',
+  COMPLIANCE_REVIEWER = 'COMPLIANCE_REVIEWER'
 }
 
 export interface IUser extends Document {
-  email: string;
   name: string;
-  passwordHash?: string;
+  email: string;
+  passwordHash: string;
   role: UserRole;
-  status: UserStatus;
+  isActive: boolean;
   lastLoginAt?: Date;
   department?: string;
   createdAt: Date;
@@ -42,18 +35,18 @@ const UserSchema = new Schema<IUser>(
     },
     passwordHash: {
       type: String,
+      required: true,
       select: false // Protected from accidental exposure
     },
     role: {
       type: String,
       enum: Object.values(UserRole),
-      default: UserRole.REVIEWER,
+      default: UserRole.MARKETING_MANAGER,
       index: true
     },
-    status: {
-      type: String,
-      enum: Object.values(UserStatus),
-      default: UserStatus.ACTIVE,
+    isActive: {
+      type: Boolean,
+      default: true,
       index: true
     },
     department: {
@@ -66,7 +59,13 @@ const UserSchema = new Schema<IUser>(
   },
   {
     timestamps: true,
-    collection: 'users'
+    collection: 'users',
+    toJSON: {
+      transform(_doc, ret) {
+        delete (ret as Record<string, unknown>).passwordHash;
+        return ret;
+      }
+    }
   }
 );
 

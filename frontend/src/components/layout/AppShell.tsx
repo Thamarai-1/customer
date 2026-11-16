@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Sidebar } from './Sidebar';
 import { TopNavbar } from './TopNavbar';
 import { NAVIGATION_ITEMS, NavItemConfig } from '../../constants/navigation';
@@ -10,28 +11,40 @@ interface AppShellProps {
 }
 
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+  const pathname = usePathname();
   const [selectedModuleId, setSelectedModuleId] = useState<string>('dashboard');
 
+  // Determine current active item based on pathname first, fallback to state
   const activeItem: NavItemConfig =
+    (pathname
+      ? NAVIGATION_ITEMS.find((item) =>
+          item.id === 'dashboard'
+            ? pathname === '/'
+            : pathname.startsWith(item.path)
+        )
+      : null) ||
     NAVIGATION_ITEMS.find((item) => item.id === selectedModuleId) ||
     NAVIGATION_ITEMS[0];
 
+  const currentTitle = pathname === '/login' ? 'Account Login' : activeItem.label;
+  const isImplementedRoute = !pathname || pathname === '/' || pathname.startsWith('/customers') || pathname === '/login';
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-slate-50 text-slate-900 font-sans">
-      {/* Sidebar Navigation Placeholder with 10 Items */}
+      {/* Sidebar Navigation */}
       <Sidebar
-        activeModuleId={selectedModuleId}
+        activeModuleId={activeItem.id}
         onSelectModule={(id) => setSelectedModuleId(id)}
       />
 
       {/* Main Container */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Navigation Bar */}
-        <TopNavbar currentTitle={activeItem.label} />
+        <TopNavbar currentTitle={currentTitle} />
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-y-auto p-6 md:p-8">
-          {selectedModuleId === 'dashboard' ? (
+          {isImplementedRoute ? (
             children
           ) : (
             <div className="max-w-5xl mx-auto space-y-6">
@@ -46,7 +59,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                   {activeItem.description}
                 </p>
                 <div className="inline-flex items-center px-3 py-1.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-xs font-medium">
-                  Phase 1 Placeholder &bull; Architecture and Data Contract Defined
+                  Phase 2 Active &bull; Planned for subsequent Hackathon phases
                 </div>
               </div>
             </div>
