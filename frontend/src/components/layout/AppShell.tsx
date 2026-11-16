@@ -40,6 +40,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, activeModuleId }) 
     pathname.startsWith('/offers') ||
     pathname.startsWith('/ai-messages') ||
     pathname.startsWith('/compliance') ||
+    pathname.startsWith('/approvals') ||
     pathname === '/login';
 
   return (

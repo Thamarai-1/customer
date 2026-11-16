@@ -107,7 +107,7 @@ export class BillingValidator {
 
       // Rule 3: Active Dispute Protection
       const disputedInvoices = latestBillingRecords.filter(
-        (b) => (b.disputeStatus && b.disputeStatus !== 'NONE') || b.invoiceStatus === 'DISPUTED'
+        (b) => (b.disputeStatus && b.disputeStatus !== 'NONE' && b.disputeStatus !== 'RESOLVED') || (b.invoiceStatus as string) === 'DISPUTED'
       );
       if (disputedInvoices.length > 0) {
         findings.push(

@@ -13,10 +13,11 @@ import policyEngineRouter from '../modules/policy-engine/policy-engine.routes.js
 import aiRouter from '../modules/ai/ai.routes.js';
 import messageGenerationRouter from '../modules/message-generation/message-generation.routes.js';
 import complianceRouter from '../modules/compliance/compliance.routes.js';
+import reviewsRouter from '../modules/reviews/review.routes.js';
 
 const apiRouter = Router();
 
-// Mount Phase 1, Phase 2, Phase 3, Phase 4, Phase 5 & Phase 6 Modules under /api/v1
+// Mount Phase 1, Phase 2, Phase 3, Phase 4, Phase 5, Phase 6 & Phase 7 Modules under /api/v1
 apiRouter.use('/health', healthRouter);
 apiRouter.use('/auth', authRouter);
 apiRouter.use('/users', userRouter);
@@ -31,5 +32,6 @@ apiRouter.use('/policy-engine', policyEngineRouter);
 apiRouter.use('/ai', aiRouter);
 apiRouter.use('/message-generation', messageGenerationRouter);
 apiRouter.use('/compliance', complianceRouter);
+apiRouter.use('/reviews', reviewsRouter);
 
 export default apiRouter;

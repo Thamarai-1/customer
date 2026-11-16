@@ -34,7 +34,12 @@ export type Permission =
   | 'ai_providers:manage'
   | 'compliance:validate'
   | 'compliance:read'
-  | 'compliance:manage';
+  | 'compliance:manage'
+  | 'reviews:read'
+  | 'reviews:assign'
+  | 'reviews:edit'
+  | 'reviews:approve'
+  | 'reviews:reject';
 
 // Centralized permission mapping per role
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
@@ -70,7 +75,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'ai_providers:manage',
     'compliance:validate',
     'compliance:read',
-    'compliance:manage'
+    'compliance:manage',
+    'reviews:read',
+    'reviews:assign',
+    'reviews:edit',
+    'reviews:approve',
+    'reviews:reject'
   ],
   [UserRole.MARKETING_MANAGER]: [
     'customers:read',
@@ -95,7 +105,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'messages:generate',
     'ai_providers:read',
     'compliance:validate',
-    'compliance:read'
+    'compliance:read',
+    'reviews:read',
+    'reviews:edit'
   ],
   [UserRole.COMPLIANCE_REVIEWER]: [
     'customers:read',
@@ -114,7 +126,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'ai_providers:read',
     'compliance:validate',
     'compliance:read',
-    'compliance:manage'
+    'compliance:manage',
+    'reviews:read',
+    'reviews:assign',
+    'reviews:edit',
+    'reviews:approve',
+    'reviews:reject'
   ]
 };
 
