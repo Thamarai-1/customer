@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CustomerApiClient, AssembledCustomerProfile } from '../../../services/customer.service';
+import { PolicyApiClient, PolicyEvaluationReport } from '../../../services/policy.service';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import { Button } from '../../../components/ui/button';
@@ -18,7 +19,12 @@ import {
   AlertCircle,
   TrendingUp,
   TrendingDown,
-  Minus
+  Minus,
+  Sparkles,
+  ShieldAlert,
+  CheckCircle2,
+  Megaphone,
+  Gift
 } from 'lucide-react';
 
 export default function CustomerDetailPage() {
@@ -27,7 +33,9 @@ export default function CustomerDetailPage() {
   const customerId = params?.id as string;
 
   const [profile, setProfile] = useState<AssembledCustomerProfile | null>(null);
+  const [policyReport, setPolicyReport] = useState<PolicyEvaluationReport | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [evaluatingPolicy, setEvaluatingPolicy] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,8 +45,12 @@ export default function CustomerDetailPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await CustomerApiClient.getCustomerProfile(customerId);
-        setProfile(data);
+        const [customerData, policyData] = await Promise.all([
+          CustomerApiClient.getCustomerProfile(customerId),
+          PolicyApiClient.getLatestPolicyEvaluation(customerId).catch(() => null)
+        ]);
+        setProfile(customerData);
+        setPolicyReport(policyData);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to load customer profile');
       } finally {
@@ -48,6 +60,19 @@ export default function CustomerDetailPage() {
 
     loadProfile();
   }, [customerId]);
+
+  const handleRunPolicyEvaluation = async () => {
+    if (!profile) return;
+    try {
+      setEvaluatingPolicy(true);
+      const report = await PolicyApiClient.evaluateCustomerPolicy(profile.customer.customerId);
+      setPolicyReport(report);
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to evaluate policy');
+    } finally {
+      setEvaluatingPolicy(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -288,6 +313,141 @@ export default function CustomerDetailPage() {
                 {communicationPreferences.optedOut ? 'Opted Out' : 'Active'}
               </Badge>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Phase 4 Policy Engine Evaluation & Recommendation Card */}
+        <Card className="border-slate-200 shadow-sm bg-white md:col-span-2">
+          <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-semibold flex items-center space-x-2 text-slate-900">
+                <Sparkles className="h-4 w-4 text-purple-600 mr-2" /> Policy Engine Evaluation & Grounded Recommendation
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Deterministic business policy evaluation, strategy mapping, billing stages and eligible rewards
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleRunPolicyEvaluation}
+              disabled={evaluatingPolicy}
+              className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8"
+            >
+              {evaluatingPolicy ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin mr-1.5" />
+                  Evaluating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3 w-3 mr-1.5" />
+                  Evaluate Policy
+                </>
+              )}
+            </Button>
+          </CardHeader>
+          <CardContent className="pt-4 text-xs space-y-4">
+            {policyReport ? (
+              <div className="space-y-4">
+                {/* Strategy & Action Banner */}
+                <div className="p-4 rounded-xl bg-purple-50 border border-purple-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">
+                      Recommended Strategy: {policyReport.strategy.primaryObjective.replace(/_/g, ' ')}
+                    </span>
+                    <Badge variant={policyReport.strategy.suppressPromotions ? 'destructive' : 'default'}>
+                      {policyReport.strategy.suppressPromotions ? 'Promotions Suppressed' : 'Promotions Allowed'}
+                    </Badge>
+                  </div>
+                  <div className="text-slate-700 text-xs">
+                    <span className="font-semibold text-slate-900">Recommended Tone: </span>
+                    <span className="font-mono text-purple-700">{policyReport.strategy.recommendedTone}</span>
+                  </div>
+                  <div className="text-slate-700 text-xs">
+                    <span className="font-semibold text-slate-900">Primary Segment: </span>
+                    <Badge variant="outline" className="ml-1 bg-white">
+                      {policyReport.strategy.primarySegment}
+                    </Badge>
+                  </div>
+                  {policyReport.strategy.reasoning.length > 0 && (
+                    <div className="pt-1 text-[11px] text-purple-800 space-y-0.5">
+                      {policyReport.strategy.reasoning.map((r, i) => (
+                        <div key={i}>• {r}</div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Billing Stage & Offers Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Billing Policy Stage */}
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-800">Billing Reminder Policy</span>
+                      <Badge
+                        variant={
+                          policyReport.billing.highestStage === 'ESCALATION_REVIEW'
+                            ? 'destructive'
+                            : policyReport.billing.highestStage !== 'NONE'
+                            ? 'warning'
+                            : 'success'
+                        }
+                      >
+                        {policyReport.billing.highestStage}
+                      </Badge>
+                    </div>
+                    <div className="text-[11px] text-slate-600">
+                      {policyReport.billing.summaryMessage}
+                    </div>
+                    {policyReport.billing.requiresHumanReview && (
+                      <div className="p-2 bg-amber-50 border border-amber-200 rounded text-amber-800 text-[11px] font-medium flex items-center gap-1.5">
+                        <ShieldAlert className="h-3.5 w-3.5 text-amber-600 flex-shrink-0" />
+                        Requires Human Approval Prior to Dispatch
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Top Recommended Offer / Campaign */}
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-800">Target Incentive / Offer</span>
+                      <Badge variant="outline" className="bg-white">
+                        {policyReport.offers.eligibleOffers.length} Eligible Offers
+                      </Badge>
+                    </div>
+                    {policyReport.recommendation.primaryOfferCode ? (
+                      <div className="text-xs">
+                        <div className="font-mono text-purple-700 font-semibold">
+                          {policyReport.recommendation.primaryOfferCode}
+                        </div>
+                        <div className="text-slate-600 text-[11px]">
+                          {policyReport.recommendation.primaryOfferName}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-[11px] text-slate-500 italic">
+                        {policyReport.strategy.suppressPromotions
+                          ? 'Promotional offers suppressed due to outstanding debt'
+                          : 'No active offers currently qualified'}
+                      </div>
+                    )}
+                    {policyReport.recommendation.recommendedCampaignName && (
+                      <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-200">
+                        Campaign: <span className="text-slate-700 font-medium">{policyReport.recommendation.recommendedCampaignName}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-6 text-slate-500 text-xs space-y-2">
+                <Sparkles className="h-6 w-6 text-slate-400 mx-auto" />
+                <p>No policy evaluation has been run for this customer yet.</p>
+                <p className="text-[11px] text-slate-400">
+                  Click &quot;Evaluate Policy&quot; to deterministically check active campaigns, offers, and billing reminder stage.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

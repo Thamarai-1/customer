@@ -8,14 +8,18 @@ import { NAVIGATION_ITEMS, NavItemConfig } from '../../constants/navigation';
 
 interface AppShellProps {
   children?: React.ReactNode;
+  activeModuleId?: string;
 }
 
-export const AppShell: React.FC<AppShellProps> = ({ children }) => {
+export const AppShell: React.FC<AppShellProps> = ({ children, activeModuleId }) => {
   const pathname = usePathname();
   const [selectedModuleId, setSelectedModuleId] = useState<string>('dashboard');
 
-  // Determine current active item based on pathname first, fallback to state
+  // Determine current active item based on prop first, then pathname, fallback to state
   const activeItem: NavItemConfig =
+    (activeModuleId
+      ? NAVIGATION_ITEMS.find((item) => item.id === activeModuleId)
+      : null) ||
     (pathname
       ? NAVIGATION_ITEMS.find((item) =>
           item.id === 'dashboard'
@@ -32,6 +36,8 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
     pathname === '/' ||
     pathname.startsWith('/customers') ||
     pathname.startsWith('/segments') ||
+    pathname.startsWith('/campaigns') ||
+    pathname.startsWith('/offers') ||
     pathname === '/login';
 
   return (

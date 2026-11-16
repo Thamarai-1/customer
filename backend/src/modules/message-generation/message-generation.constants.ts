@@ -1,0 +1,20 @@
+export enum MessageGenerationStatus {
+  GENERATED = 'GENERATED',
+  GROUNDING_FAILED = 'GROUNDING_FAILED',
+  FAILED = 'FAILED',
+  REFUSED = 'REFUSED'
+}
+
+export enum GroundingStatus {
+  PASSED = 'PASSED',
+  FAILED = 'FAILED',
+  FLAGGED = 'FLAGGED'
+}
+
+export const PROMPT_VERSIONS = {
+  APPRECIATION: '1.0.0',
+  LOYALTY_REWARD: '1.0.0',
+  RE_ENGAGEMENT: '1.0.0',
+  RETENTION: '1.0.0',
+  BILLING_REMINDER: '1.0.0'
+};

@@ -18,7 +18,16 @@ export type Permission =
   | 'segmentation:read'
   | 'segmentation:classify'
   | 'segmentation:manage'
-  | 'audit:read';
+  | 'audit:read'
+  | 'campaigns:read'
+  | 'campaigns:manage'
+  | 'offers:read'
+  | 'offers:manage'
+  | 'strategies:read'
+  | 'strategies:manage'
+  | 'billing_policies:read'
+  | 'billing_policies:manage'
+  | 'policy_engine:evaluate';
 
 // Centralized permission mapping per role
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
@@ -38,7 +47,16 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'segmentation:read',
     'segmentation:classify',
     'segmentation:manage',
-    'audit:read'
+    'audit:read',
+    'campaigns:read',
+    'campaigns:manage',
+    'offers:read',
+    'offers:manage',
+    'strategies:read',
+    'strategies:manage',
+    'billing_policies:read',
+    'billing_policies:manage',
+    'policy_engine:evaluate'
   ],
   [UserRole.MARKETING_MANAGER]: [
     'customers:read',
@@ -51,7 +69,14 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'preferences:update',
     'import:execute',
     'segmentation:read',
-    'segmentation:classify'
+    'segmentation:classify',
+    'campaigns:read',
+    'campaigns:manage',
+    'offers:read',
+    'offers:manage',
+    'strategies:read',
+    'billing_policies:read',
+    'policy_engine:evaluate'
   ],
   [UserRole.COMPLIANCE_REVIEWER]: [
     'customers:read',
@@ -60,7 +85,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'preferences:read',
     'preferences:update',
     'segmentation:read',
-    'audit:read'
+    'audit:read',
+    'campaigns:read',
+    'offers:read',
+    'strategies:read',
+    'billing_policies:read',
+    'policy_engine:evaluate'
   ]
 };
 

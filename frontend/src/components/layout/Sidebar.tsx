@@ -87,8 +87,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeModuleId, onSelectModule
         <div className="flex items-center space-x-2 text-slate-400 text-xs">
           <Shield className="h-4 w-4 text-emerald-400 flex-shrink-0" />
           <div className="truncate">
-            <p className="text-[11px] font-medium text-slate-200">Phase 3: Active</p>
-            <p className="text-[10px] text-slate-400">Segmentation Engine Ready</p>
+            <p className="text-[11px] font-medium text-slate-200">Phase 4: Active</p>
+            <p className="text-[10px] text-slate-400">Policy Engine Ready</p>
           </div>
         </div>
       </div>

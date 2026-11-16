@@ -17,9 +17,15 @@
     "seed:activities": "tsx src/scripts/seed-activities.ts",
     "seed:billing": "tsx src/scripts/seed-billing.ts",
     "seed:preferences": "tsx src/scripts/seed-preferences.ts",
-    "seed:segments": "tsx src/scripts/seed-segments.ts"
+    "seed:segments": "tsx src/scripts/seed-segments.ts",
+    "seed:offers": "tsx src/scripts/seed-offers.ts",
+    "seed:campaigns": "tsx src/scripts/seed-campaigns.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "@google/genai": "^3.3.0",
+    "@langchain/core": "^1.4.1",
+    "@langchain/langgraph": "^1.7.4",
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -32,6 +38,7 @@
     "mongoose": "^8.9.5",
     "morgan": "^1.10.0",
     "multer": "^2.5.0",
+    "openai": "^7.57.0",
     "redis": "^4.7.0",
     "zod": "^3.24.1"
   },

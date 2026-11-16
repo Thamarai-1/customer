@@ -40,10 +40,18 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().default('admin@engagement.hcl.com'),
   ADMIN_PASSWORD: z.string().default('Admin@Secure2026!'),
   ADMIN_NAME: z.string().default('System Administrator'),
-  // GenAI provider placeholders for Phase 5 (optional in Phase 1)
+  // GenAI Provider Configuration for Phase 5
+  AI_PROVIDER: z.enum(['OPENAI', 'GEMINI', 'ANTHROPIC']).default('OPENAI'),
   OPENAI_API_KEY: z.string().optional().default(''),
+  OPENAI_MODEL: z.string().default('gpt-4o-mini'),
   GEMINI_API_KEY: z.string().optional().default(''),
-  ANTHROPIC_API_KEY: z.string().optional().default('')
+  GEMINI_MODEL: z.string().default('gemini-2.5-flash'),
+  ANTHROPIC_API_KEY: z.string().optional().default(''),
+  ANTHROPIC_MODEL: z.string().default('claude-3-5-haiku-20241022'),
+  MESSAGE_GENERATION_TEMPERATURE: z.coerce.number().default(0.3),
+  MESSAGE_GENERATION_MAX_TOKENS: z.coerce.number().default(1200),
+  MESSAGE_GENERATION_TIMEOUT_MS: z.coerce.number().default(30000),
+  MESSAGE_GENERATION_RETRY_LIMIT: z.coerce.number().default(2)
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;
