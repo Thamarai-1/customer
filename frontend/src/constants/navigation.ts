@@ -7,6 +7,9 @@ import {
   Sparkles,
   CheckSquare,
   ShieldCheck,
+  Send,
+  BarChart3,
+  FlaskConical,
   FileText,
   Settings,
   type LucideIcon
@@ -60,17 +63,10 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
   },
   {
     id: 'ai-messages',
-    label: 'AI Message Generator',
+    label: 'AI Generator',
     icon: Sparkles,
     path: '/ai-messages',
     description: 'Grounded email generation bounded by verified customer facts'
-  },
-  {
-    id: 'approvals',
-    label: 'Approval Queue',
-    icon: CheckSquare,
-    path: '/approvals',
-    description: 'Human-in-the-loop review interface for generated drafts and evidence'
   },
   {
     id: 'compliance',
@@ -78,6 +74,34 @@ export const NAVIGATION_ITEMS: NavItemConfig[] = [
     icon: ShieldCheck,
     path: '/compliance',
     description: 'Safety validations, tone checks, consent verification and refusal rules'
+  },
+  {
+    id: 'approvals',
+    label: 'Human Review',
+    icon: CheckSquare,
+    path: '/approvals',
+    description: 'Human-in-the-loop review interface for generated drafts and evidence'
+  },
+  {
+    id: 'deliveries',
+    label: 'Deliveries',
+    icon: Send,
+    path: '/deliveries',
+    description: 'Controlled mock and draft-only delivery tracking and idempotency logs'
+  },
+  {
+    id: 'evaluation',
+    label: 'Evaluation',
+    icon: BarChart3,
+    path: '/evaluation',
+    description: 'Confusion matrix, accuracy metrics, latency stats and report export'
+  },
+  {
+    id: 'demo',
+    label: 'Demo Scenarios',
+    icon: FlaskConical,
+    path: '/demo',
+    description: '5 Hackathon customer scenarios and mandatory refusal demonstrations'
   },
   {
     id: 'audit-logs',

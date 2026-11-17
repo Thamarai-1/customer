@@ -69,7 +69,9 @@ export class GroundingValidator {
     const mentionedPercentages = EvidenceExtractor.extractPercentages(text);
     const maxApprovedDiscount = Math.max(
       0,
-      ...latestOffers.map((o) => (o.valueType === 'PERCENTAGE' ? o.value : 0))
+      ...latestOffers.map((o) =>
+        o.valueType === 'PERCENTAGE' || (o as any).offerType === 'PERCENTAGE_DISCOUNT' ? o.value : 0
+      )
     );
 
     for (const pct of mentionedPercentages) {

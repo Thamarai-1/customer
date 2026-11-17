@@ -19,7 +19,9 @@
     "seed:preferences": "tsx src/scripts/seed-preferences.ts",
     "seed:segments": "tsx src/scripts/seed-segments.ts",
     "seed:offers": "tsx src/scripts/seed-offers.ts",
-    "seed:campaigns": "tsx src/scripts/seed-campaigns.ts"
+    "seed:campaigns": "tsx src/scripts/seed-campaigns.ts",
+    "seed:demo": "tsx src/scripts/seed-demo.ts",
+    "reset:demo": "tsx src/scripts/reset-demo.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",

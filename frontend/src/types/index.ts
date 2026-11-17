@@ -9,6 +9,9 @@ export type NavItemKey =
   | 'ai-messages'
   | 'approvals'
   | 'compliance'
+  | 'deliveries'
+  | 'evaluation'
+  | 'demo'
   | 'audit-logs'
   | 'settings';
 

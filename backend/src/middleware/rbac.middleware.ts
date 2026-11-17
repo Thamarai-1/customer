@@ -39,7 +39,12 @@ export type Permission =
   | 'reviews:assign'
   | 'reviews:edit'
   | 'reviews:approve'
-  | 'reviews:reject';
+  | 'reviews:reject'
+  | 'deliveries:read'
+  | 'deliveries:create'
+  | 'deliveries:retry'
+  | 'evaluation:read'
+  | 'demo:manage';
 
 // Centralized permission mapping per role
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
@@ -80,7 +85,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'reviews:assign',
     'reviews:edit',
     'reviews:approve',
-    'reviews:reject'
+    'reviews:reject',
+    'deliveries:read',
+    'deliveries:create',
+    'deliveries:retry',
+    'evaluation:read',
+    'demo:manage'
   ],
   [UserRole.MARKETING_MANAGER]: [
     'customers:read',
@@ -107,7 +117,11 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'compliance:validate',
     'compliance:read',
     'reviews:read',
-    'reviews:edit'
+    'reviews:edit',
+    'deliveries:read',
+    'deliveries:create',
+    'evaluation:read',
+    'demo:manage'
   ],
   [UserRole.COMPLIANCE_REVIEWER]: [
     'customers:read',
@@ -131,7 +145,12 @@ export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'reviews:assign',
     'reviews:edit',
     'reviews:approve',
-    'reviews:reject'
+    'reviews:reject',
+    'deliveries:read',
+    'deliveries:create',
+    'deliveries:retry',
+    'evaluation:read',
+    'demo:manage'
   ]
 };
 
